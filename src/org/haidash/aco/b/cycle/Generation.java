@@ -81,9 +81,9 @@ public class Generation {
 		}
 	}
 
-	public SearchResult start() {
+	public SearchResult search() {
 
-		SearchResult bestSearchResult = null;
+		SearchResult bestResult = null;
 
 		for (int i = 0; i < numAnts; i++) {
 
@@ -99,19 +99,21 @@ public class Generation {
 							cycles,
 							nodeVisits,
 							pheromones);
+
 			ant.updatePheromones(globalPheromones);
-			final SearchResult searchResult = ant.start();
+
+			final SearchResult searchResult = ant.search();
 
 			if (searchResult == null) {
 				continue;
 			}
 
-			if (bestSearchResult == null || searchResult.getTotalCost() < bestSearchResult.getTotalCost()) {
-				bestSearchResult = searchResult;
+			if (bestResult == null || searchResult.getTotalCost() < bestResult.getTotalCost()) {
+				bestResult = searchResult;
 			}
 		}
 
-		return bestSearchResult;
+		return bestResult;
 	}
 
 }

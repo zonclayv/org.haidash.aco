@@ -1,15 +1,14 @@
 package org.haidash.aco.b.cycle;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.haidash.aco.model.Agent;
+import org.haidash.aco.model.Chance;
 import org.haidash.aco.model.Pair;
 import org.haidash.aco.model.SearchResult;
 
@@ -109,6 +108,7 @@ public class Ant implements Agent {
 	}
 
 	private void addCycle(final Cycle cycle) {
+
 		final int node = cycle.getStartNode();
 
 		if (!cycles.containsKey(node)) {
@@ -119,18 +119,19 @@ public class Ant implements Agent {
 					|| oldCycle.getFuel() == cycle.getFuel()
 					&& oldCycle.getVisited().size() > cycle.getVisited().size()) {
 				cycles.remove(oldCycle);
+
 				cycles.put(node, cycle);
 			}
 		}
 	}
 
-	private void addVisit(final int from, final int to) {
+	private void incVisits(final int from, final int to) {
 		final int count = visitsCount[from][to];
 		visitsCount[from][to] = count + 1;
-
 	}
 
 	private boolean applyCycle(final Cycle cycle) {
+
 		final List<Integer> visitedNodes = cycle.getVisited();
 		int currentNode = visitedNodes.get(0);
 
@@ -156,12 +157,14 @@ public class Ant implements Agent {
 		return true;
 	}
 
-	private boolean applyNextNode(final int currentNode, final int next, int usedFuel, final Cycle cycle) {
+	private boolean getToNextNode(final int currentNode, final int next, int usedFuel, final Cycle cycle) {
 
 		int futureFuelBalance = fuelBalance + usedFuel - nodesMap[currentNode][next];
 
 		if (futureFuelBalance < 0) {
+
 			if (applyCycle(cycle)) {
+
 				usedFuel = getAvailableFuel(currentNode) - nodesMap[currentNode][next];
 				futureFuelBalance = fuelBalance - nodesMap[currentNode][next] + usedFuel;
 
@@ -174,18 +177,17 @@ public class Ant implements Agent {
 			}
 		}
 
-		// 1
 		visited.add(next);
-		final int remainingFuelInCurrentNode = tempFuelLevel[currentNode] - usedFuel;
 
 		spentFuelLevel.add(usedFuel);
-		tempFuelLevel[currentNode] = remainingFuelInCurrentNode;
 
-		// 2
+		final int newFuelLevel = tempFuelLevel[currentNode] - usedFuel;
+		tempFuelLevel[currentNode] = newFuelLevel;
+
 		fuelBalance = futureFuelBalance;
 		totalCost += usedFuel;
 
-		addVisit(currentNode, next);
+		incVisits(currentNode, next);
 
 		return true;
 	}
@@ -233,7 +235,7 @@ public class Ant implements Agent {
 		return cycle;
 	}
 
-	private void fillProbabilities(final int currentNode, final Cycle cycle, final Map<Pair<Integer, Double>, Integer> probabilities) {
+	private void fillChances(final int currentNode, final Cycle cycle, final List<Chance> chances) {
 
 		double sum = -1.0;
 
@@ -294,7 +296,11 @@ public class Ant implements Agent {
 
 			final double probability = 100 * Math.pow(tau, AntColony.ALPHA) * Math.pow(eta, AntColony.BETA) / sum;
 
-			probabilities.put(new Pair<Integer, Double>(nextNode, probability), usedFuel);
+			Chance chance = new Chance(nextNode, usedFuel, probability);
+
+			if (!chances.contains(chance)) {
+				chances.add(chance);
+			}
 		}
 	}
 
@@ -308,19 +314,23 @@ public class Ant implements Agent {
 		}
 	}
 
-	private int getFuelAfterCycle(final int currentNode, final int currentAvailableFuel, final int fuelInCycle) {
+	private int getFuelAfterCycle(final int currentNode, final int availableFuel, final int fuelInCycle) {
+
 		final int fuelInNode = tempFuelLevel[currentNode];
+
 		int tempFuel = 0;
+
 		if (fuelBalance + fuelInNode > maxFuel) {
-			tempFuel = maxFuel - currentAvailableFuel;
+			tempFuel = maxFuel - availableFuel;
 		} else {
-			tempFuel = fuelBalance + fuelInNode - currentAvailableFuel;
+			tempFuel = fuelBalance + fuelInNode - availableFuel;
 		}
 
 		return tempFuel + fuelInCycle;
 	}
 
 	private double getSumProbabilities(final int currentNode, final Cycle cycle, final int availableFuel, final int usedFuel) {
+
 		double sum = 0.0;
 
 		for (int nextNode = 0; nextNode < numNodes; nextNode++) {
@@ -373,6 +383,7 @@ public class Ant implements Agent {
 			sum += Math.pow(tau, AntColony.ALPHA) * Math.pow(eta, AntColony.BETA);
 
 		}
+
 		return sum;
 	}
 
@@ -394,7 +405,7 @@ public class Ant implements Agent {
 		fuelBalance += usedFuel - nodesMap[currentNode][next];
 		totalCost += usedFuel;
 
-		addVisit(currentNode, next);
+		incVisits(currentNode, next);
 	}
 
 	private boolean isBadPath(final List<Integer> visits, final int nextNode) {
@@ -423,49 +434,49 @@ public class Ant implements Agent {
 
 	private final int selectNextNode(final int currentNode) {
 
-		final Map<Pair<Integer, Double>, Integer> probabilities = new HashMap<Pair<Integer, Double>, Integer>();
+		final List<Chance> chances = new ArrayList<Chance>();
 		final Cycle cycle = cycles.get(currentNode);
 
-		fillProbabilities(currentNode, cycle, probabilities);
+		fillChances(currentNode, cycle, chances);
 
-		if (probabilities.size() == 0 || outOfFuel) {
+		if (chances.size() == 0 || outOfFuel) {
 			outOfFuel = true;
 
 			return -1;
 		}
 
-		Double rouletteProbabilities = 0.0;
+		Double roulette = 0.0;
 
-		for (final Pair<Integer, Double> pair : probabilities.keySet()) {
-			rouletteProbabilities += pair.second;
+		for (final Chance chance : chances) {
+			roulette += chance.getValue();
 		}
 
-		final int r = random.nextInt(rouletteProbabilities.intValue());
+		final int r = random.nextInt(roulette.intValue());
 
-		rouletteProbabilities = 0.0;
+		roulette = 0.0;
 
-		for (final Entry<Pair<Integer, Double>, Integer> entry : probabilities.entrySet()) {
+		for (final Chance chance : chances) {
 
-			final Pair<Integer, Double> pair = entry.getKey();
-			final int usedFuels = entry.getValue();
+			final int nextNode = chance.getNode();
+			final int usedFuels = chance.getFuel();
+			final double probability = chance.getValue();
 
-			rouletteProbabilities += pair.second;
+			roulette += probability;
 
-			if (rouletteProbabilities < r) {
+			if (roulette < r) {
 				continue;
 			}
 
-			final int nextNode = pair.first;
-
-			if (!applyNextNode(currentNode, nextNode, usedFuels, cycle)) {
+			if (!getToNextNode(currentNode, nextNode, usedFuels, cycle)) {
 				return -1;
 			}
 
-			final int indexOf = visited.indexOf(nextNode);
+			final int firstIndexOf = visited.indexOf(nextNode);
 			final int lastIndexOf = visited.lastIndexOf(nextNode);
 
-			if (indexOf != lastIndexOf && indexOf != -1) {
+			if (firstIndexOf != lastIndexOf && firstIndexOf != -1) {
 				final Cycle newCycle = createCycle(nextNode);
+
 				addCycle(newCycle);
 			}
 
@@ -476,7 +487,7 @@ public class Ant implements Agent {
 	}
 
 	@Override
-	public final SearchResult start() {
+	public final SearchResult search() {
 
 		while (node != targetNode && !outOfFuel && node != -1) {
 			node = selectNextNode(node);

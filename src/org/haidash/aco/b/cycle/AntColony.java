@@ -1,5 +1,6 @@
 package org.haidash.aco.b.cycle;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -19,8 +20,6 @@ public class AntColony implements SearchAlgorithm {
 
 	private final Logger logger = Logger.getLogger(AntColony.class);
 
-	public static final String INPUT = "files/input_26.txt";
-
 	public static final double ALPHA = 0.1;
 	public static final double BETA = 0.1;
 	public static final double Q = 0.0001d;
@@ -36,24 +35,15 @@ public class AntColony implements SearchAlgorithm {
 
 	private int[][] nodesMap;
 	private int[] fuelLevels;
-	private final Pair<Double, Double>[][] globalPheromones;
-	private final int[] remainsFuel;
+	private Pair<Double, Double>[][] globalPheromones;
+	private int[] remainsFuel;
+
 	private final Map<Integer, Cycle> cycles;
 	private final Set<List<Integer>> badPaths;
 
-	public AntColony() throws IOException {
-
+	public AntColony() {
 		this.cycles = new HashMap<Integer, Cycle>();
 		this.badPaths = new HashSet<List<Integer>>();
-
-		readFromFile(INPUT);
-
-		numAnts = numNodes / 2;
-		numGeneration = numNodes / 2;
-
-		globalPheromones = initGlobalPheromones();
-
-		this.remainsFuel = FloydWarshall.getRemainsFuel(numNodes, nodesMap, fuelLevels, maxFuel, targetNode);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -70,41 +60,47 @@ public class AntColony implements SearchAlgorithm {
 		return result;
 	}
 
-	private void readFromFile(final String filePath) throws IOException {
+	@Override
+	public void initializeValue(final File file) throws IOException {
 
-		final Scanner text = new Scanner(new FileReader(filePath));
+		try (Scanner text = new Scanner(new FileReader(file))) {
 
-		numNodes = text.nextInt();
+			numNodes = text.nextInt();
 
-		fuelLevels = new int[numNodes];
+			fuelLevels = new int[numNodes];
 
-		for (int i = 0; i < numNodes; i++) {
-			fuelLevels[i] = text.nextInt();
-		}
-
-		final int numEdges = text.nextInt();
-
-		nodesMap = new int[numNodes][numNodes];
-
-		for (int i = 0; i < numNodes; i++) {
-			for (int j = 0; j < numNodes; j++) {
-				nodesMap[i][j] = -1;
+			for (int i = 0; i < numNodes; i++) {
+				fuelLevels[i] = text.nextInt();
 			}
+
+			final int numEdges = text.nextInt();
+
+			nodesMap = new int[numNodes][numNodes];
+
+			for (int i = 0; i < numNodes; i++) {
+				for (int j = 0; j < numNodes; j++) {
+					nodesMap[i][j] = -1;
+				}
+			}
+
+			for (int i = 0; i < numEdges; i++) {
+				final int start = text.nextInt();
+				final int finish = text.nextInt();
+
+				nodesMap[start][finish] = text.nextInt();
+			}
+
+			maxFuel = text.nextInt();
+			startNode = text.nextInt();
+			targetNode = text.nextInt();
+
 		}
 
-		for (int i = 0; i < numEdges; i++) {
-			final int start = text.nextInt();
-			final int finish = text.nextInt();
+		numAnts = numNodes / 2;
+		numGeneration = numNodes / 2;
 
-			nodesMap[start][finish] = text.nextInt();
-		}
-
-		maxFuel = text.nextInt();
-
-		startNode = text.nextInt();
-		targetNode = text.nextInt();
-
-		text.close();
+		globalPheromones = initGlobalPheromones();
+		remainsFuel = FloydWarshall.getRemainsFuel(numNodes, nodesMap, fuelLevels, maxFuel, targetNode);
 	}
 
 	@Override
@@ -114,7 +110,8 @@ public class AntColony implements SearchAlgorithm {
 
 		long startTime = System.currentTimeMillis();
 
-		SearchResult bestSearchResult = null;
+		SearchResult bestResult = null;
+
 		for (int i = 0; i < numGeneration; i++) {
 
 			final Generation generation =
@@ -129,8 +126,10 @@ public class AntColony implements SearchAlgorithm {
 							badPaths,
 							cycles,
 							globalPheromones);
+
 			generation.initPheromones(globalPheromones);
-			final SearchResult route = generation.start();
+
+			final SearchResult route = generation.search();
 
 			updatePheromones();
 
@@ -138,24 +137,25 @@ public class AntColony implements SearchAlgorithm {
 				continue;
 			}
 
-			if (bestSearchResult == null || route.getTotalCost() < bestSearchResult.getTotalCost()) {
-				bestSearchResult = route;
+			if (bestResult == null || route.getTotalCost() < bestResult.getTotalCost()) {
+				bestResult = route;
 			}
 		}
 
 		logger.info("PROCESS FINISH (" + (System.currentTimeMillis() - startTime) + "ms):");
 
-		if (bestSearchResult == null) {
+		if (bestResult == null) {
 			logger.info("Path not found");
 		} else {
-			logger.info("Best path: " + bestSearchResult.getTotalCost());
-			logger.info(bestSearchResult.getVisited().toString());
+			logger.info("Best path: " + bestResult.getTotalCost());
+			logger.info(bestResult.getVisited().toString());
 		}
 
-		return bestSearchResult;
+		return bestResult;
 	}
 
 	private void updatePheromones() {
+
 		for (int i = 0; i < numNodes; i++) {
 			for (int j = 0; j < numNodes; j++) {
 
@@ -165,11 +165,13 @@ public class AntColony implements SearchAlgorithm {
 				double nValue = pheromon.second;
 
 				pValue *= 1.0 - AntColony.PHEROMONE_PERSISTENCE;
+
 				if (pValue < 1.0) {
 					pValue = 1.0;
 				}
 
 				nValue *= 1.0 - AntColony.PHEROMONE_PERSISTENCE;
+
 				if (nValue < 1.0) {
 					nValue = 1.0;
 				}

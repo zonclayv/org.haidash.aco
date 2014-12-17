@@ -1,5 +1,6 @@
 package org.haidash.aco.trunk;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
@@ -12,8 +13,6 @@ import org.haidash.aco.model.SearchResult;
 public class AntColony implements SearchAlgorithm {
 
 	private final Logger logger = Logger.getLogger(AntColony.class);
-
-	public static String INPUT = "files/input.txt";
 
 	public static final double ALPHA = 0.1;
 	public static final double BETA = 0.1;
@@ -35,19 +34,10 @@ public class AntColony implements SearchAlgorithm {
 
 	public volatile Pair<Double, Double>[][] globalPheromones;
 
-	private final int[] remainsFuel;
+	private int[] remainsFuel;
 
-	public AntColony() throws IOException {
+	public AntColony() {
 
-		initInput();
-
-		numAnts = numNodes;
-		numGeneration = numNodes;
-
-		globalPheromones = initializeGlobalPheromones();
-
-		final FloydWarshall floydWarshall = new FloydWarshall(numNodes, matrix, fuelLevel, maxFuel, targetNode);
-		this.remainsFuel = floydWarshall.getRemainsFuel();
 	}
 
 	public int getRemainsFuel(final int index) {
@@ -68,9 +58,10 @@ public class AntColony implements SearchAlgorithm {
 		return result;
 	}
 
-	private void initInput() throws IOException {
+	@Override
+	public void initializeValue(File file) throws IOException {
 
-		final Scanner text = new Scanner(new FileReader(INPUT));
+		final Scanner text = new Scanner(new FileReader(file));
 
 		numNodes = text.nextInt();
 
@@ -103,6 +94,14 @@ public class AntColony implements SearchAlgorithm {
 		targetNode = text.nextInt();
 
 		text.close();
+
+		numAnts = numNodes;
+		numGeneration = numNodes;
+
+		globalPheromones = initializeGlobalPheromones();
+
+		final FloydWarshall floydWarshall = new FloydWarshall(numNodes, matrix, fuelLevel, maxFuel, targetNode);
+		this.remainsFuel = floydWarshall.getRemainsFuel();
 	}
 
 	@Override
