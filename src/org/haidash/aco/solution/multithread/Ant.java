@@ -1,4 +1,4 @@
-package org.haidash.aco.a.multithread;
+package org.haidash.aco.solution.multithread;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.haidash.aco.a.multithread.AntColony.Route;
 import org.haidash.aco.model.Pair;
+import org.haidash.aco.solution.multithread.AntColony.Route;
 
 public class Ant {
 

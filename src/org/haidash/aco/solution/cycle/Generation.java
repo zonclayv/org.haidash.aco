@@ -1,4 +1,4 @@
-package org.haidash.aco.b.cycle;
+package org.haidash.aco.solution.cycle;
 
 import java.util.List;
 import java.util.Map;

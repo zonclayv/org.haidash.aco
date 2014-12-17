@@ -1,11 +1,12 @@
 package org.haidash.aco.trunk;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
+import org.haidash.aco.model.AcoRuntimeException;
 import org.haidash.aco.model.Pair;
 import org.haidash.aco.model.SearchAlgorithm;
 import org.haidash.aco.model.SearchResult;
@@ -59,41 +60,43 @@ public class AntColony implements SearchAlgorithm {
 	}
 
 	@Override
-	public void initializeValue(File file) throws IOException {
+	public void initializeValue(File file) throws AcoRuntimeException {
 
-		final Scanner text = new Scanner(new FileReader(file));
+		try (Scanner text = new Scanner(new FileReader(file))) {
 
-		numNodes = text.nextInt();
+			numNodes = text.nextInt();
 
-		fuelLevel = new int[numNodes];
+			fuelLevel = new int[numNodes];
 
-		for (int i = 0; i < numNodes; i++) {
-			fuelLevel[i] = text.nextInt();
-		}
-
-		final int numEdges = text.nextInt();
-
-		matrix = new int[numNodes][numNodes];
-
-		for (int i = 0; i < numNodes; i++) {
-			for (int j = 0; j < numNodes; j++) {
-				matrix[i][j] = -1;
+			for (int i = 0; i < numNodes; i++) {
+				fuelLevel[i] = text.nextInt();
 			}
+
+			final int numEdges = text.nextInt();
+
+			matrix = new int[numNodes][numNodes];
+
+			for (int i = 0; i < numNodes; i++) {
+				for (int j = 0; j < numNodes; j++) {
+					matrix[i][j] = -1;
+				}
+			}
+
+			for (int i = 0; i < numEdges; i++) {
+				final int start = text.nextInt();
+				final int finish = text.nextInt();
+
+				matrix[start][finish] = text.nextInt();
+			}
+
+			maxFuel = text.nextInt();
+
+			startNode = text.nextInt();
+			targetNode = text.nextInt();
+
+		} catch (FileNotFoundException e) {
+			throw new AcoRuntimeException("Can't find input file", e);
 		}
-
-		for (int i = 0; i < numEdges; i++) {
-			final int start = text.nextInt();
-			final int finish = text.nextInt();
-
-			matrix[start][finish] = text.nextInt();
-		}
-
-		maxFuel = text.nextInt();
-
-		startNode = text.nextInt();
-		targetNode = text.nextInt();
-
-		text.close();
 
 		numAnts = numNodes;
 		numGeneration = numNodes;

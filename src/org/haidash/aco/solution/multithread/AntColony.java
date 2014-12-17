@@ -1,4 +1,4 @@
-package org.haidash.aco.a.multithread;
+package org.haidash.aco.solution.multithread;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -34,7 +34,7 @@ public class AntColony {
 
 	private final Logger logger = Logger.getLogger(this.getClass().getSimpleName());
 
-	public static String INPUT = "files/input.txt";
+	public static String INPUT = "files/input8.txt";
 
 	public static double ALPHA = 0.1;
 	public static double BETA = 0.1;
@@ -173,7 +173,7 @@ public class AntColony {
 		text.close();
 	}
 
-	final int start() throws InterruptedException, ExecutionException {
+	public final int start() throws InterruptedException, ExecutionException {
 
 		logger.info("=========================================================================");
 		logger.info("PROCESS START '" + startNode + "' -> '" + targetNode + "'...");
@@ -191,7 +191,7 @@ public class AntColony {
 
 		for (Iterator<Future<Route>> iterator = futures.iterator(); iterator.hasNext();) {
 
-			Future<Route> future = (Future<Route>) iterator.next();
+			Future<Route> future = iterator.next();
 
 			final Route route = future.get();
 

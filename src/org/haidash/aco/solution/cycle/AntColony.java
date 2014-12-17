@@ -1,8 +1,8 @@
-package org.haidash.aco.b.cycle;
+package org.haidash.aco.solution.cycle;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -11,6 +11,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.haidash.aco.model.AcoRuntimeException;
 import org.haidash.aco.model.FloydWarshall;
 import org.haidash.aco.model.Pair;
 import org.haidash.aco.model.SearchAlgorithm;
@@ -61,7 +62,7 @@ public class AntColony implements SearchAlgorithm {
 	}
 
 	@Override
-	public void initializeValue(final File file) throws IOException {
+	public void initializeValue(final File file) throws AcoRuntimeException {
 
 		try (Scanner text = new Scanner(new FileReader(file))) {
 
@@ -94,6 +95,8 @@ public class AntColony implements SearchAlgorithm {
 			startNode = text.nextInt();
 			targetNode = text.nextInt();
 
+		} catch (FileNotFoundException e) {
+			throw new AcoRuntimeException("Can't find input file", e);
 		}
 
 		numAnts = numNodes / 2;
