@@ -25,7 +25,7 @@ public class Generation {
 	private final Pair<Double, Double>[][] globalPheromones;
 
 	// local
-	private Pair<Double, Double>[][] pheromones;
+	private final Pair<Double, Double>[][] pheromones;
 	private final int[][] nodeVisits;
 
 	public Generation(final int startNode,
@@ -55,6 +55,7 @@ public class Generation {
 
 		// local
 		this.nodeVisits = initMatrix();
+		this.pheromones = initPheromones(globalPheromones);
 	}
 
 	private int[][] initMatrix() {
@@ -70,15 +71,17 @@ public class Generation {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void initPheromones(Pair<Double, Double>[][] globalPheromones) {
+	private Pair<Double, Double>[][] initPheromones(Pair<Double, Double>[][] globalPheromones) {
 
-		pheromones = new Pair[numNodes][numNodes];
+		Pair<Double, Double>[][] pheromones = new Pair[numNodes][numNodes];
 
 		for (int i = 0; i < numNodes; i++) {
 			for (int j = 0; j < numNodes; j++) {
 				pheromones[i][j] = new Pair<Double, Double>(globalPheromones[i][j]);
 			}
 		}
+
+		return pheromones;
 	}
 
 	public SearchResult search() {

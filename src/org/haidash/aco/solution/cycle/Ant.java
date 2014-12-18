@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.haidash.aco.model.Agent;
-import org.haidash.aco.model.Chance;
 import org.haidash.aco.model.Pair;
 import org.haidash.aco.model.SearchResult;
 
@@ -114,12 +113,14 @@ public class Ant implements Agent {
 		if (!cycles.containsKey(node)) {
 			cycles.put(node, cycle);
 		} else {
+
 			final Cycle oldCycle = cycles.get(node);
+
 			if (oldCycle.getFuel() < cycle.getFuel()
 					|| oldCycle.getFuel() == cycle.getFuel()
 					&& oldCycle.getVisited().size() > cycle.getVisited().size()) {
-				cycles.remove(oldCycle);
 
+				cycles.remove(oldCycle);
 				cycles.put(node, cycle);
 			}
 		}
@@ -136,21 +137,22 @@ public class Ant implements Agent {
 		int currentNode = visitedNodes.get(0);
 
 		for (int i = 1; i < visitedNodes.size(); i++) {
+
 			final int nextNode = visitedNodes.get(i);
-
 			final int fuelCost = nodesMap[currentNode][nextNode];
-
 			final int availableFuel = getAvailableFuel(currentNode);
 
 			if (availableFuel < fuelCost) {
 				outOfFuel = true;
 				cycles.remove(cycle.getStartNode());
+
 				return false;
 			}
 
 			final int usedFuel = availableFuel - fuelBalance;
 
 			goToNextNode(currentNode, nextNode, usedFuel);
+
 			currentNode = nextNode;
 		}
 
@@ -178,12 +180,11 @@ public class Ant implements Agent {
 		}
 
 		visited.add(next);
-
 		spentFuelLevel.add(usedFuel);
 
 		final int newFuelLevel = tempFuelLevel[currentNode] - usedFuel;
-		tempFuelLevel[currentNode] = newFuelLevel;
 
+		tempFuelLevel[currentNode] = newFuelLevel;
 		fuelBalance = futureFuelBalance;
 		totalCost += usedFuel;
 
@@ -193,7 +194,9 @@ public class Ant implements Agent {
 	}
 
 	private int countNumberEqual(final List<Integer> itemList, final int item) {
+
 		int count = 0;
+
 		for (int i = 1; i < itemList.size(); i++) {
 			final int it = itemList.get(i);
 
@@ -215,6 +218,7 @@ public class Ant implements Agent {
 		final List<Integer> visitedVertices = cycle.getVisited();
 
 		for (int i = visited.indexOf(startNode); i < visited.size(); i++) {
+
 			final int node = visited.get(i);
 
 			if (!visitedVertices.contains(node)) {
@@ -226,6 +230,7 @@ public class Ant implements Agent {
 			if (i != visited.size() - 1) {
 
 				final int nextVertex = visited.get(i + 1);
+
 				fuel -= nodesMap[node][nextVertex];
 			}
 		}
@@ -497,9 +502,11 @@ public class Ant implements Agent {
 
 		if (!outOfFuel) {
 			searchResult = new SearchResult(spentFuelLevel, visited, totalCost);
+
 			LOGGER.info("New path " + searchResult.getTotalCost() + " " + visited.toString());
 		} else {
 			badPaths.add(visited);
+
 			LOGGER.info("Out fuel " + visited.toString());
 		}
 

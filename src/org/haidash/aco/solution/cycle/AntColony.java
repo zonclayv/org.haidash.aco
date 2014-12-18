@@ -36,8 +36,8 @@ public class AntColony implements SearchAlgorithm {
 
 	private int[][] nodesMap;
 	private int[] fuelLevels;
-	private Pair<Double, Double>[][] globalPheromones;
 	private int[] remainsFuel;
+	private Pair<Double, Double>[][] globalPheromones;
 
 	private final Map<Integer, Cycle> cycles;
 	private final Set<List<Integer>> badPaths;
@@ -129,8 +129,6 @@ public class AntColony implements SearchAlgorithm {
 							badPaths,
 							cycles,
 							globalPheromones);
-
-			generation.initPheromones(globalPheromones);
 
 			final SearchResult route = generation.search();
 
