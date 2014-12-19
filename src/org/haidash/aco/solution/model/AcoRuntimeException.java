@@ -1,4 +1,4 @@
-package org.haidash.aco.model;
+package org.haidash.aco.solution.model;
 
 import org.apache.log4j.Logger;
 

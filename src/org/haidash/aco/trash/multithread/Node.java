@@ -1,10 +1,10 @@
-package org.haidash.aco.solution.multithread;
+package org.haidash.aco.trash.multithread;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.haidash.aco.model.Pair;
+import org.haidash.aco.trash.model.Pair;
 
 public class Node {
 

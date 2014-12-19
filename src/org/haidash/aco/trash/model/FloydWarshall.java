@@ -1,44 +1,31 @@
-package org.haidash.aco.trunk;
+package org.haidash.aco.trash.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FloydWarshall {
 
-	private int nodesNumber;
-	private int maxFuel;
-	private int targetNode;
+	private static List<List<Integer>> costsToMove = new ArrayList<List<Integer>>();
+	private static List<List<Integer>> fuel = new ArrayList<List<Integer>>();
+	private static List<List<Integer>> prevNode = new ArrayList<List<Integer>>();
+	private static List<Integer> remainsFuel = new ArrayList<Integer>();
 
-	private int[][] matrix;
-	private int[] fuelInNodes;
-
-	private List<ArrayList<Integer>> costsToMove;
-	private List<ArrayList<Integer>> fuel;
-	private List<ArrayList<Integer>> prevNode;
-	private int[] remainsFuel;
-
-	public FloydWarshall(int nodesNumber, int[][] matrix, int[] fuelInNodes, int maxFuel, int targetNode) {
-		this.nodesNumber = nodesNumber;
-		this.maxFuel = maxFuel;
-		this.matrix = matrix;
-		this.fuelInNodes = fuelInNodes;
-		this.targetNode = targetNode;
-		calculate();
+	private static int[] convertIntegers(List<Integer> integers) {
+		int[] ret = new int[integers.size()];
+		for (int i = 0; i < ret.length; i++) {
+			ret[i] = integers.get(i).intValue();
+		}
+		return ret;
 	}
 
-	public int[] getRemainsFuel() {
-		return remainsFuel;
+	public static int[] getRemainsFuel(int nodesNumber, int[][] matrix, int[] fuelInNodes, int maxFuel, int targetNode) {
+
+		calculate(nodesNumber, maxFuel, targetNode, matrix, fuelInNodes);
+
+		return convertIntegers(remainsFuel);
 	}
 
-	public List<ArrayList<Integer>> getCostsToMove() {
-		return costsToMove;
-	}
-
-	private void calculate() {
-		costsToMove = new ArrayList<ArrayList<Integer>>();
-		fuel = new ArrayList<ArrayList<Integer>>();
-		remainsFuel = new int[nodesNumber];
-		prevNode = new ArrayList<ArrayList<Integer>>();
+	private static void calculate(int nodesNumber, int maxFuel, int targetNode, int[][] matrix, int[] fuelInNodes) {
 
 		final int inf = Integer.MAX_VALUE;
 
@@ -54,7 +41,7 @@ public class FloydWarshall {
 
 			costsToMove.add(new ArrayList<Integer>(line));
 			fuel.add(new ArrayList<Integer>(line));
-			remainsFuel[i] = inf;
+			remainsFuel.add(inf);
 		}
 
 		for (int i = 0; i < nodesNumber; i++) {
@@ -127,10 +114,10 @@ public class FloydWarshall {
 			do {
 				from = findPrevVertex(finish, start);
 				if ((costsToMove.get(start).get(from) == inf) || (fuel.get(start).get(from) == inf)) {
-					remainsFuel[i] = Math.min(remainsFuel[i], inf);
+					remainsFuel.set(i, Math.min(remainsFuel.get(i), inf));
 
 				} else {
-					remainsFuel[i] = Math.min(remainsFuel[i], fuel.get(i).get(from) - costsToMove.get(i).get(from));
+					remainsFuel.set(i, Math.min(remainsFuel.get(i), fuel.get(i).get(from) - costsToMove.get(i).get(from)));
 				}
 
 				start = from;
@@ -140,7 +127,7 @@ public class FloydWarshall {
 
 	}
 
-	public int findPrevVertex(int start, int finish) {
+	private static int findPrevVertex(int start, int finish) {
 		return prevNode.get(start).get(finish);
 	}
 }

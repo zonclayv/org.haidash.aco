@@ -1,4 +1,4 @@
-package org.haidash.aco.trunk;
+package org.haidash.aco.trash.trunk;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -6,10 +6,10 @@ import java.io.FileReader;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
-import org.haidash.aco.model.AcoRuntimeException;
-import org.haidash.aco.model.Pair;
-import org.haidash.aco.model.SearchAlgorithm;
-import org.haidash.aco.model.SearchResult;
+import org.haidash.aco.solution.model.AcoRuntimeException;
+import org.haidash.aco.trash.model.Pair;
+import org.haidash.aco.trash.model.SearchAlgorithm;
+import org.haidash.aco.trash.model.SearchResult;
 
 public class AntColony implements SearchAlgorithm {
 

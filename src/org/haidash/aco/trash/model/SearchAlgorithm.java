@@ -1,6 +1,8 @@
-package org.haidash.aco.model;
+package org.haidash.aco.trash.model;
 
 import java.io.File;
+
+import org.haidash.aco.solution.model.AcoRuntimeException;
 
 public interface SearchAlgorithm {
 
