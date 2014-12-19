@@ -1,18 +1,16 @@
-package org.haidash.aco.solution.cycle;
+package org.haidash.aco.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Cycle {
 
 	private int startNode;
 
-	private final List<Integer> nodes;
+	private List<Integer> nodes;
 
 	private int fuel;
 
 	public Cycle() {
-		this.nodes = new ArrayList<Integer>();
 	}
 
 	public int getFuel() {
@@ -23,8 +21,12 @@ public class Cycle {
 		return startNode;
 	}
 
-	public List<Integer> getVisited() {
+	public List<Integer> getNodes() {
 		return nodes;
+	}
+
+	public void setNodes(List<Integer> nodes) {
+		this.nodes = nodes;
 	}
 
 	public void setFuel(final int fuel) {

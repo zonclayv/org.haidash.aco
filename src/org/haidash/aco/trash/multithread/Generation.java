@@ -1,12 +1,12 @@
-package org.haidash.aco.solution.multithread;
+package org.haidash.aco.trash.multithread;
 
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
-import org.haidash.aco.model.Pair;
-import org.haidash.aco.solution.multithread.AntColony.Route;
+import org.haidash.aco.trash.model.Pair;
+import org.haidash.aco.trash.multithread.AntColony.Route;
 
 public class Generation implements Callable<Route> {
 

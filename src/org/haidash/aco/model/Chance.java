@@ -1,4 +1,4 @@
-package org.haidash.aco.solution.cycle;
+package org.haidash.aco.model;
 
 
 public class Chance {

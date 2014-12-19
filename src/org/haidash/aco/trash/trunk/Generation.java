@@ -1,9 +1,9 @@
-package org.haidash.aco.trunk;
+package org.haidash.aco.trash.trunk;
 
 import java.util.List;
 
-import org.haidash.aco.model.Pair;
-import org.haidash.aco.model.SearchResult;
+import org.haidash.aco.trash.model.Pair;
+import org.haidash.aco.trash.model.SearchResult;
 
 public class Generation {
 

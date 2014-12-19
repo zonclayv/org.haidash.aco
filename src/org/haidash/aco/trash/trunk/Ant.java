@@ -1,12 +1,12 @@
-package org.haidash.aco.trunk;
+package org.haidash.aco.trash.trunk;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.haidash.aco.model.Pair;
-import org.haidash.aco.model.SearchResult;
+import org.haidash.aco.trash.model.Pair;
+import org.haidash.aco.trash.model.SearchResult;
 
 public class Ant {
 

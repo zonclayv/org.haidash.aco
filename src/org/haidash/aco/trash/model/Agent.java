@@ -1,8 +1,7 @@
-package org.haidash.aco.model;
+package org.haidash.aco.trash.model;
 
 public interface Agent {
 
-	public SearchResult search();
-
+	public void search();
 	public void updatePheromones(Pair<Double, Double>[][] pheromones);
 }

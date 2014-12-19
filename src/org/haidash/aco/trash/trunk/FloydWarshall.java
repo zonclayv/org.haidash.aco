@@ -1,4 +1,4 @@
-package org.haidash.aco.solution.multithread;
+package org.haidash.aco.trash.trunk;
 
 import java.util.ArrayList;
 import java.util.List;

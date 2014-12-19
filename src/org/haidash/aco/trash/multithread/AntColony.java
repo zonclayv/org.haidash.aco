@@ -1,4 +1,4 @@
-package org.haidash.aco.solution.multithread;
+package org.haidash.aco.trash.multithread;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -15,7 +15,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
-import org.haidash.aco.model.Pair;
+import org.haidash.aco.trash.model.Pair;
 
 public class AntColony {
 

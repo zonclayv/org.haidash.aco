@@ -1,4 +1,4 @@
-package org.haidash.aco.solution.multithread;
+package org.haidash.aco.trash.multithread;
 
 import static org.junit.Assert.assertTrue;
 
