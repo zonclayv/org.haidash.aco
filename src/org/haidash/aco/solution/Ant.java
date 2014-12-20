@@ -476,6 +476,7 @@ public class Ant {
 
 		final int r = RANDOM.nextInt(roulette.intValue());
 
+
 		roulette = 0.0;
 
 		for (final Chance chance : chances) {
